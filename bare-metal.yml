@@ -1,0 +1,39 @@
+header:
+  version: 8
+
+machine: qemuarm64
+distro: poky
+target:
+  - baremetal-helloworld
+
+repos:
+  poky:
+    url: git://git.yoctoproject.org/git/poky
+    path: layers/poky
+    refspec: dunfell
+    layers:
+      meta:
+      meta-poky:
+      meta-yocto-bsp:
+      meta-skeleton:
+
+local_conf_header:
+  standard: |
+    TCLIBC = "baremetal"
+    CONF_VERSION = "1"
+    PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
+    PATCHRESOLVE = "noop"
+    USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+    PACKAGE_CLASSES ?= "package_rpm"
+  debug-tweaks: |
+    EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+  diskmon: |
+    BB_DISKMON_DIRS ??= "\
+      STOPTASKS,${TMPDIR},1G,100K \
+      STOPTASKS,${DL_DIR},1G,100K \
+      STOPTASKS,${SSTATE_DIR},1G,100K \
+      STOPTASKS,/tmp,100M,100K \
+      ABORT,${TMPDIR},100M,1K \
+      ABORT,${DL_DIR},100M,1K \
+      ABORT,${SSTATE_DIR},100M,1K \
+      ABORT,/tmp,10M,1K"    
